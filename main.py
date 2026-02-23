@@ -85,6 +85,7 @@ def startTurnDynamic(speed):
     else:
         left_motor.run(1 * speed)
         right_motor.run(-1 * speed)
+
 def playNote(note):
     if (note == "A"):
         ev3.speaker.beep(440)
@@ -112,6 +113,7 @@ def playNote(note):
         ev3.speaker.beep(830.6093952)
     if (note == "A5"):
         ev3.speaker.beep(880)
+
 
 # CODE BELOW
 
