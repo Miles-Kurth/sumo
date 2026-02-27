@@ -1,3 +1,5 @@
+#!/usr/bin/env pybricks-micropython
+
 from pybricks.hubs import EV3Brick
 from pybricks.ev3devices import Motor, GyroSensor, ColorSensor
 from pybricks.parameters import Port,Stop
@@ -26,14 +28,15 @@ class LaserSensor:
 ev3 = EV3Brick()
 
 # Initialize motors
-left_motor = Motor(Port.B)
-right_motor = Motor(Port.C)
-arm_motor = Motor(Port.A)
+front_left_motor = Motor(Port.A)
+front_right_motor = Motor(Port.D)
+back_left_motor = Motor(Port.B)
+back_right_motor = Motor(Port.C)
 
 # Initialize sensors
-laser_sensor = LaserSensor(Port.S1)
-color_sensor = ColorSensor(Port.S3)
-gyro_sensor = GyroSensor(Port.S4)
+# laser_sensor = LaserSensor(Port.S1)
+# color_sensor = ColorSensor(Port.S3)
+# gyro_sensor = GyroSensor(Port.S4)
 
 # Declare variables
 armDirection = "not set"
@@ -45,7 +48,8 @@ speed = 200 # mm/s
 # move at the correct speed when you give a motor command.
 # The axle track is the distance between the points where the wheels
 # touch the ground.
-robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104) #104 -> 119?
+
+# robot = DriveBase(front_left_motor, front_right_motor, wheel_diameter=55.5, axle_track=104) #104 -> 119?
 #robot.settings()
 
 # At start
@@ -54,37 +58,6 @@ ev3.speaker.set_volume(20); #ev3.speaker.beep(660,200)
 
 
 # Functions
-
-def printLaserDistance():
-    print("Laser distance: " + str(laser_sensor.distance()) + "mm")
-
-def printGyroAngle():
-    print("Gyro: " + str(gyro_sensor.angle()) + "°")
-
-
-def start():
-    robot.brake()
-    gyro_sensor.reset_angle(0)
-    left_motor.reset_angle(0)
-    right_motor.reset_angle(0)
-    ev3.speaker.set_volume(20)
-    playNote("A")
-    playNote("C#")
-    playNote("E")
-
-    wait(10)
-
-def resetWheelAngles():
-    left_motor.reset_angle(0)
-    right_motor.reset_angle(0)
-
-def startTurnDynamic(speed):
-    if (speed > 0):
-        left_motor.run(1 * speed)
-        right_motor.run(-1 * speed)
-    else:
-        left_motor.run(1 * speed)
-        right_motor.run(-1 * speed)
 
 def playNote(note):
     if (note == "A"):
@@ -114,7 +87,67 @@ def playNote(note):
     if (note == "A5"):
         ev3.speaker.beep(880)
 
+def printLaserDistance():
+    print("Laser distance: " + str(laser_sensor.distance()) + "mm")
+
+def printGyroAngle():
+    print("Gyro: " + str(gyro_sensor.angle()) + "°")
+
+def resetWheelAngles():
+    front_left_motor.reset_angle(0)
+    front_right_motor.reset_angle(0)
+    back_left_motor.reset_angle(0)
+    back_right_motor.reset_angle(0)
+
+def brake():
+    front_left_motor.brake()
+    front_right_motor.brake()
+    back_left_motor.brake()
+    back_right_motor.brake()
+
+def drive(speed, angle):
+    front_left_motor.run(-speed)
+    front_right_motor.run(-speed)
+    back_left_motor.run(speed)
+    back_right_motor.run(speed)
+
+def startTurn(speed):
+    front_left_motor.run(1 * -speed)
+    front_right_motor.run(-1 * -speed)
+    back_left_motor.run(1 * speed)
+    back_right_motor.run(-1 * speed)
+
+def start():
+    brake()
+    # gyro_sensor.reset_angle(0)
+    resetWheelAngles()
+    ev3.speaker.set_volume(20)
+    playNote("A")
+    playNote("C#")
+    playNote("E")
+
+
+
+
+
 
 # CODE BELOW
 
 start()
+
+drive(1000,0)
+wait(1000)
+drive(-1000,0)
+wait(1000)
+brake()
+
+# startTurn(500)
+# wait(1000)
+# startTurn(-500)
+# wait(1000)
+
+# front_left_motor.run(-400)
+# front_right_motor.run(200)
+# back_left_motor.run(400)
+# back_right_motor.run(-200)
+# wait(1000)
