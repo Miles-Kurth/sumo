@@ -28,20 +28,18 @@ class LaserSensor:
 ev3 = EV3Brick()
 
 # Initialize motors
-front_left_motor = Motor(Port.A)
-front_right_motor = Motor(Port.D)
-back_left_motor = Motor(Port.B)
-back_right_motor = Motor(Port.C)
+left_motor = Motor(Port.A)
+right_motor = Motor(Port.D)
 
 # Initialize sensors
-# laser_sensor = LaserSensor(Port.S1)
-# color_sensor = ColorSensor(Port.S3)
-# gyro_sensor = GyroSensor(Port.S4)
+laser_sensor = LaserSensor(Port.S1)
+color_sensor = ColorSensor(Port.S4)
+gyro_sensor = GyroSensor(Port.S3)
 
 # Declare variables
-armDirection = "not set"
+# armDirection = "not set"
 targetAngle = 0 # degrees
-speed = 200 # mm/s
+# speed = 200 # mm/s
 
 # The DriveBase is composed of two motors, with a wheel on each motor.
 # The wheel_diameter and axle_track values are used to make the motors
@@ -49,7 +47,7 @@ speed = 200 # mm/s
 # The axle track is the distance between the points where the wheels
 # touch the ground.
 
-# robot = DriveBase(front_left_motor, front_right_motor, wheel_diameter=55.5, axle_track=104) #104 -> 119?
+robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104) #104 -> 119?
 #robot.settings()
 
 # At start
@@ -93,32 +91,25 @@ def printLaserDistance():
 def printGyroAngle():
     print("Gyro: " + str(gyro_sensor.angle()) + "°")
 
+def printColorReflection():
+    print("Reflection: " + str(color_sensor.reflection()))
+
 def resetWheelAngles():
-    front_left_motor.reset_angle(0)
-    front_right_motor.reset_angle(0)
-    back_left_motor.reset_angle(0)
-    back_right_motor.reset_angle(0)
-
-def brake():
-    front_left_motor.brake()
-    front_right_motor.brake()
-    back_left_motor.brake()
-    back_right_motor.brake()
-
-def drive(speed, angle):
-    front_left_motor.run(-speed)
-    front_right_motor.run(-speed)
-    back_left_motor.run(speed)
-    back_right_motor.run(speed)
+    left_motor.reset_angle(0)
+    right_motor.reset_angle(0)
 
 def startTurn(speed):
-    front_left_motor.run(1 * -speed)
-    front_right_motor.run(-1 * -speed)
-    back_left_motor.run(1 * speed)
-    back_right_motor.run(-1 * speed)
+    left_motor.run(1 * -speed)
+    right_motor.run(-1 * -speed)
+
+def drive(speed):
+    robot.drive(-speed, 0)
+
+def straight(distance):
+    robot.straight(-distance)
 
 def start():
-    brake()
+    robot.brake()
     # gyro_sensor.reset_angle(0)
     resetWheelAngles()
     ev3.speaker.set_volume(20)
@@ -135,19 +126,31 @@ def start():
 
 start()
 
-drive(1000,0)
-wait(1000)
-drive(-1000,0)
-wait(1000)
-brake()
+drive(1000)
+wait(500)
+drive(300)
+while (color_sensor.reflection() < 20):
+    printColorReflection()
+    continue
+robot.brake()
+gyro_sensor.reset_angle(0)
+startTurn(1000)
+while (gyro_sensor.angle() < 60):
+    continue
+robot.brake()
+robot.drive(-150,-60)
+driveNow = False
+for i in range(650):
+    printLaserDistance()
+    if (laser_sensor.distance() < 1000):
+        driveNow = True
+        break
+    wait(1)
 
-# startTurn(500)
-# wait(1000)
-# startTurn(-500)
-# wait(1000)
+if (not driveNow):
+    startTurn(80)
+    while (laser_sensor.distance() > 700):
+        continue
 
-# front_left_motor.run(-400)
-# front_right_motor.run(200)
-# back_left_motor.run(400)
-# back_right_motor.run(-200)
-# wait(1000)
+drive(1000)
+wait(1000)
