@@ -28,13 +28,16 @@ class LaserSensor:
 ev3 = EV3Brick()
 
 # Initialize motors
-left_motor = Motor(Port.A)
-right_motor = Motor(Port.D)
+# Left/Right, Side/Middle
+LS_motor = Motor(Port.A)
+LM_motor = Motor(Port.B)
+RS_motor = Motor(Port.D)
+RM_motor = Motor(Port.C)
 
 # Initialize sensors
 laser_sensor = LaserSensor(Port.S1)
-color_sensor = ColorSensor(Port.S4)
 gyro_sensor = GyroSensor(Port.S3)
+color_sensor = ColorSensor(Port.S4)
 
 # Declare variables
 # armDirection = "not set"
@@ -47,7 +50,7 @@ targetAngle = 0 # degrees
 # The axle track is the distance between the points where the wheels
 # touch the ground.
 
-robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104) #104 -> 119?
+# robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=104) #104 -> 119?
 #robot.settings()
 
 # At start
@@ -95,22 +98,35 @@ def printColorReflection():
     print("Reflection: " + str(color_sensor.reflection()))
 
 def resetWheelAngles():
-    left_motor.reset_angle(0)
-    right_motor.reset_angle(0)
+    LS_motor.reset_angle(0)
+    LM_motor.reset_angle(0)
+    RS_motor.reset_angle(0)
+    RM_motor.reset_angle(0)
+
+def brake():
+    LS_motor.brake()
+    LM_motor.brake()
+    RS_motor.brake()
+    RM_motor.brake()
 
 def startTurn(speed):
-    left_motor.run(1 * -speed)
-    right_motor.run(-1 * -speed)
+    LS_motor.run(1 * -speed)
+    LM_motor.run(1 * -speed)
+    RS_motor.run(-1 * -speed)
+    RM_motor.run(-1 * -speed)
 
 def drive(speed):
-    robot.drive(-speed, 0)
+    LS_motor.run(-speed)
+    LM_motor.run(-speed)
+    RS_motor.run(-speed)
+    RM_motor.run(-speed)
 
-def straight(distance):
-    robot.straight(-distance)
+# def straight(distance):
+    
 
 def start():
-    robot.brake()
-    # gyro_sensor.reset_angle(0)
+    brake()
+    gyro_sensor.reset_angle(0)
     resetWheelAngles()
     ev3.speaker.set_volume(20)
     playNote("A")
@@ -127,30 +143,54 @@ def start():
 start()
 
 drive(1000)
-wait(500)
-drive(300)
-while (color_sensor.reflection() < 20):
-    printColorReflection()
-    continue
-robot.brake()
-gyro_sensor.reset_angle(0)
-startTurn(1000)
-while (gyro_sensor.angle() < 60):
-    continue
-robot.brake()
-robot.drive(-150,-60)
-driveNow = False
-for i in range(650):
+wait(700)
+brake()
+
+startTurn(200)
+while (laser_sensor.distance() > 1000):
     printLaserDistance()
-    if (laser_sensor.distance() < 1000):
-        driveNow = True
-        break
-    wait(1)
-
-if (not driveNow):
-    startTurn(80)
-    while (laser_sensor.distance() > 700):
-        continue
-
+    continue
+brake()
+wait(100)
+startTurn(-75)
+while (laser_sensor.distance() > 1000):
+    printLaserDistance()
+    continue
+brake()
 drive(1000)
-wait(1000)
+time.sleep(5)
+
+
+
+# drive(1000)
+# wait(800)
+# drive(300)
+
+# while (color_sensor.reflection() < 20):
+#     printColorReflection()
+#     continue
+# brake()
+
+# gyro_sensor.reset_angle(0)
+# startTurn(1000)
+# while (gyro_sensor.angle() < 70):
+#     continue
+# brake()
+
+# drive(-150,60)
+
+# driveNow = False
+# for i in range(650):
+#     printLaserDistance()
+#     if (laser_sensor.distance() < 1000):
+#         driveNow = True
+#         break
+#     wait(1)
+
+# if (not driveNow):
+#     startTurn(80)
+#     while (laser_sensor.distance() > 700):
+#         continue
+
+# drive(1000,0)
+# wait(1000)
