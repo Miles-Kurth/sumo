@@ -154,32 +154,40 @@ wait(startDelay)
 start()
 
 drive(1000)
-wait(700)
+wait(750)
 brake()
 wait(100)
 
 startTurn(1000)
-wait(600)
+wait(450)
 
 # brake()
 # wait(1000)
 
 startTurn(170) # turn
-while (laser_sensor.distance() > 1000):
-    printLaserDistance()
+while (laser_sensor.distance() > 700):
+    # printLaserDistance()
     continue
-wait(50)
+# wait(50)
 brake()
 
 wait(50)
 
-startTurn(-80) # turn back
-while (laser_sensor.distance() > 1000):
-    printLaserDistance()
-    continue
+# startTurn(-80) # turn back
+# while (laser_sensor.distance() > 700):
+#     # printLaserDistance()
+#     continue
+# brake()
+startTurn(-100)
+wait(200)
 brake()
+
 wait(100)
 drive(1000)
+
+while (color_sensor.reflection() < 20):
+    continue
+brake()
 time.sleep(5)
 
 
