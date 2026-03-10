@@ -1,7 +1,7 @@
 #!/usr/bin/env pybricks-micropython
 
 from pybricks.hubs import EV3Brick
-from pybricks.ev3devices import Motor, GyroSensor, ColorSensor
+from pybricks.ev3devices import Motor, GyroSensor, ColorSensor, TouchSensor
 from pybricks.parameters import Port,Stop
 from pybricks.tools import wait
 from pybricks.robotics import DriveBase
@@ -36,6 +36,7 @@ RM_motor = Motor(Port.C)
 
 # Initialize sensors
 laser_sensor = LaserSensor(Port.S1)
+touch_sensor = TouchSensor(Port.S2)
 gyro_sensor = GyroSensor(Port.S3)
 color_sensor = ColorSensor(Port.S4)
 
@@ -116,47 +117,68 @@ def startTurn(speed):
     RM_motor.run(-1 * -speed)
 
 def drive(speed):
+    # if (speed > 100): speed = 100
+    # if (speed < -100): speed = -100
     LS_motor.run(-speed)
     LM_motor.run(-speed)
     RS_motor.run(-speed)
     RM_motor.run(-speed)
-
-# def straight(distance):
     
 
 def start():
+    reset()
+    playNote("A")
+    playNote("C#")
+    playNote("E")
+
+def reset():
     brake()
     gyro_sensor.reset_angle(0)
     resetWheelAngles()
     ev3.speaker.set_volume(20)
     playNote("A")
-    playNote("C#")
-    playNote("E")
+    playNote("A")
+    playNote("A")
 
 
 
-
-
+startDelay = 5000
 
 # CODE BELOW
+reset()
+
+while (touch_sensor.pressed() == False):
+    continue
+wait(startDelay)
 
 start()
 
 drive(1000)
 wait(700)
 brake()
+wait(100)
 
-startTurn(200)
+startTurn(1000)
+wait(600)
+
+# brake()
+# wait(1000)
+
+startTurn(170) # turn
+while (laser_sensor.distance() > 1000):
+    printLaserDistance()
+    continue
+wait(50)
+brake()
+
+wait(50)
+
+startTurn(-80) # turn back
 while (laser_sensor.distance() > 1000):
     printLaserDistance()
     continue
 brake()
 wait(100)
-startTurn(-75)
-while (laser_sensor.distance() > 1000):
-    printLaserDistance()
-    continue
-brake()
 drive(1000)
 time.sleep(5)
 
