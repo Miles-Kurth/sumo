@@ -17,7 +17,7 @@ class LaserSensor:
 
     def distance(self):
         now = time.time()
-        if now - self.last_time > 0.08:
+        if now - self.last_time > 0.02:
             self.last_time = now
             results = self.i2c.read(0x42, 2)
             self.last_dist = results[0] + (results[1] << 8)
@@ -41,7 +41,7 @@ gyro_sensor = GyroSensor(Port.S3)
 color_sensor = ColorSensor(Port.S4)
 
 # Declare variables
-# armDirection = "not set"
+turnDirection = "not set"
 targetAngle = 0 # degrees
 # speed = 200 # mm/s
 
@@ -123,7 +123,21 @@ def drive(speed):
     LM_motor.run(-speed)
     RS_motor.run(-speed)
     RM_motor.run(-speed)
-    
+
+def checkSide():
+    startTurn(300)
+    wait(400)
+    brake()
+    wait(100)
+    if (color_sensor.reflection() < 20):
+        global turnDirection; turnDirection = "right"
+    else:
+        global turnDirection; turnDirection = "left"
+    startTurn(-300)
+    wait(400)
+    brake()
+    wait(100)
+    print(turnDirection)
 
 def start():
     reset()
@@ -142,7 +156,7 @@ def reset():
 
 
 
-startDelay = 5000
+startDelay = 1000
 
 # CODE BELOW
 reset()
@@ -154,11 +168,25 @@ wait(startDelay)
 start()
 
 drive(1000)
-wait(750)
+wait(400)
+drive(500)
+while (color_sensor.reflection() < 20):
+    continue
 brake()
 wait(100)
 
-startTurn(1000)
+# drive(-500)
+# wait(400)
+# brake()
+# wait(100)
+checkSide()
+
+
+if (turnDirection == "left"):
+    startTurn(-1000)
+else:
+    startTurn(1000)
+
 wait(450)
 
 # brake()
@@ -188,7 +216,7 @@ drive(1000)
 while (color_sensor.reflection() < 20):
     continue
 brake()
-time.sleep(5)
+time.sleep(1)
 
 
 
