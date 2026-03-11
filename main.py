@@ -17,7 +17,7 @@ class LaserSensor:
 
     def distance(self):
         now = time.time()
-        if now - self.last_time > 0.02:
+        if now - self.last_time > 0.03:
             self.last_time = now
             results = self.i2c.read(0x42, 2)
             self.last_dist = results[0] + (results[1] << 8)
@@ -126,17 +126,17 @@ def drive(speed):
 
 def checkSide():
     startTurn(300)
-    wait(400)
+    wait(500)
     brake()
-    wait(100)
+    wait(50)
+    global turnDirection
     if (color_sensor.reflection() < 20):
-        global turnDirection; turnDirection = "right"
+        turnDirection = "right"
     else:
-        global turnDirection; turnDirection = "left"
-    startTurn(-300)
-    wait(400)
-    brake()
-    wait(100)
+        turnDirection = "left"
+    print(turnDirection)
+    if (turnDirection == "right"): turnDirection = 1
+    if (turnDirection == "left"): turnDirection = -1
     print(turnDirection)
 
 def start():
@@ -149,10 +149,11 @@ def reset():
     brake()
     gyro_sensor.reset_angle(0)
     resetWheelAngles()
-    ev3.speaker.set_volume(20)
+    ev3.speaker.set_volume(0)
     playNote("A")
     playNote("A")
     playNote("A")
+    print("READY TO START")
 
 
 
@@ -168,49 +169,39 @@ wait(startDelay)
 start()
 
 drive(1000)
-wait(400)
-drive(500)
+wait(600)
+drive(300)
 while (color_sensor.reflection() < 20):
     continue
 brake()
 wait(100)
 
-# drive(-500)
-# wait(400)
-# brake()
-# wait(100)
 checkSide()
+wait(50)
 
-
-if (turnDirection == "left"):
-    startTurn(-1000)
+startTurn((1000 * turnDirection))
+if (turnDirection == "-1"):
+    wait(1000)
 else:
-    startTurn(1000)
+    wait(180)
 
-wait(450)
 
-# brake()
-# wait(1000)
+startTurn((170 * turnDirection)) # turn
 
-startTurn(170) # turn
 while (laser_sensor.distance() > 700):
     # printLaserDistance()
     continue
-# wait(50)
+
 brake()
-
-wait(50)
-
-# startTurn(-80) # turn back
-# while (laser_sensor.distance() > 700):
-#     # printLaserDistance()
-#     continue
-# brake()
-startTurn(-100)
-wait(200)
-brake()
-
 wait(100)
+
+
+startTurn(-150 * turnDirection)
+wait(200)
+
+brake()
+wait(100)
+
 drive(1000)
 
 while (color_sensor.reflection() < 20):
