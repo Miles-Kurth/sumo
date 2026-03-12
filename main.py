@@ -149,7 +149,7 @@ def reset():
     brake()
     gyro_sensor.reset_angle(0)
     resetWheelAngles()
-    ev3.speaker.set_volume(0)
+    ev3.speaker.set_volume(10)
     playNote("A")
     playNote("A")
     playNote("A")
@@ -170,20 +170,20 @@ start()
 
 drive(1000)
 wait(600)
-drive(300)
+drive(250)
 while (color_sensor.reflection() < 20):
     continue
 brake()
-wait(100)
+wait(50)
 
 checkSide()
 wait(50)
 
 startTurn((1000 * turnDirection))
-if (turnDirection == "-1"):
-    wait(1000)
+if (turnDirection == -1):
+    wait(600)
 else:
-    wait(180)
+    wait(250)
 
 
 startTurn((170 * turnDirection)) # turn
@@ -207,39 +207,5 @@ drive(1000)
 while (color_sensor.reflection() < 20):
     continue
 brake()
-time.sleep(1)
+time.sleep(0)
 
-
-
-# drive(1000)
-# wait(800)
-# drive(300)
-
-# while (color_sensor.reflection() < 20):
-#     printColorReflection()
-#     continue
-# brake()
-
-# gyro_sensor.reset_angle(0)
-# startTurn(1000)
-# while (gyro_sensor.angle() < 70):
-#     continue
-# brake()
-
-# drive(-150,60)
-
-# driveNow = False
-# for i in range(650):
-#     printLaserDistance()
-#     if (laser_sensor.distance() < 1000):
-#         driveNow = True
-#         break
-#     wait(1)
-
-# if (not driveNow):
-#     startTurn(80)
-#     while (laser_sensor.distance() > 700):
-#         continue
-
-# drive(1000,0)
-# wait(1000)
