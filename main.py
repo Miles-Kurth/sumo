@@ -7,6 +7,7 @@ from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 from pybricks.iodevices import I2CDevice
 import time
+import sys
 
 
 class LaserSensor:
@@ -140,7 +141,7 @@ def checkSide():
     print(turnDirection)
 
 def start():
-    reset()
+    # reset()
     playNote("A")
     playNote("C#")
     playNote("E")
@@ -155,16 +156,21 @@ def reset():
     playNote("A")
     print("READY TO START")
 
+def checkStop():
+    if (touch_sensor.pressed()):
+        sys.exit()
 
 
-startDelay = 1000
 
 # CODE BELOW
+
+startDelay = 5000
+
 reset()
 
 while (touch_sensor.pressed() == False):
     continue
-wait(startDelay)
+wait(startDelay - 200)
 
 start()
 
@@ -172,6 +178,7 @@ drive(1000)
 wait(600)
 drive(250)
 while (color_sensor.reflection() < 20):
+    checkStop()
     continue
 brake()
 wait(50)
@@ -179,17 +186,18 @@ wait(50)
 checkSide()
 wait(50)
 
-startTurn((1000 * turnDirection))
+startTurn(1000 * turnDirection)
 if (turnDirection == -1):
     wait(600)
 else:
     wait(250)
 
 
-startTurn((170 * turnDirection)) # turn
+startTurn(170 * turnDirection) # turn
 
 while (laser_sensor.distance() > 700):
-    # printLaserDistance()
+    printLaserDistance()
+    checkStop()
     continue
 
 brake()
@@ -205,7 +213,36 @@ wait(100)
 drive(1000)
 
 while (color_sensor.reflection() < 20):
+    checkStop()
     continue
 brake()
-time.sleep(0)
+wait(100)
 
+drive(-1000)
+wait(600)
+
+while(True):
+    startTurn(1000 * turnDirection)
+    wait(300)
+
+    startTurn(170 * turnDirection)
+    while (laser_sensor.distance() > 700):
+        # printLaserDistance()
+        checkStop()
+        continue
+    brake()
+    wait(100)
+
+    startTurn(-150 * turnDirection)
+    wait(200)
+    brake()
+    wait(100)
+
+    drive(1000)
+    while (color_sensor.reflection() < 20):
+        continue
+    brake()
+    wait(100)
+
+    drive(-1000)
+    wait(600)
