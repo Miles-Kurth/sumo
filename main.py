@@ -175,7 +175,7 @@ wait(startDelay - 200)
 start()
 
 drive(1000)
-wait(600)
+wait(650)
 drive(250)
 while (color_sensor.reflection() < 20):
     checkStop()
