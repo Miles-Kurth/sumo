@@ -8,12 +8,6 @@ from pybricks.robotics import DriveBase
 from pybricks.iodevices import I2CDevice
 import time
 import sys
-import os
-
-import _thread
-import threading
-from _thread import start_new_thread, allocate_lock
-
 
 
 class LaserSensor:
@@ -99,8 +93,8 @@ def playNote(note):
 def printLaserDistance():
     print("Laser distance: " + str(laser_sensor.distance()) + "mm")
 
-def printGyroAngle():
-    print("Gyro: " + str(gyro_sensor.angle()) + "°")
+# def printGyroAngle():
+    # print("Gyro: " + str(gyro_sensor.angle()) + "°")
 
 def printColorReflection():
     print("Reflection: " + str(color_sensor.reflection()))
@@ -146,6 +140,19 @@ def checkSide():
     if (turnDirection == "left"): turnDirection = -1
     print(turnDirection)
 
+def countdown():
+    playNote("A")
+    wait(850)
+    playNote("C")
+    wait(850)
+    playNote("D")
+    wait(850)
+    playNote("E")
+    wait(850)
+    playNote("G")
+    wait(850)
+    print("test")
+
 def start():
     # reset()
     playNote("A")
@@ -165,65 +172,26 @@ def reset():
 def stopProgram():
     sys.exit()
 
-speaker_lock = allocate_lock()
-
-def checkButtonPressed(thread_name, delay):
-    # import _thread
-    count = 0
-    while count < 3:
-        time.sleep(delay)
-        if (touch_sensor.pressed()):
-            print("test")
-            _thread.interrupt_main()
-            # os.kill()
-        count = 1
-
-
-# _thread.start_new_thread(checkButtonPressed, ("Thread-1", 0.1, ))
-# start_new_thread(checkButtonPressed, ("Thread-1", 0.1, ))
-
-def locked_beep(frequency, duration):
-    """Call ev3.speaker.beep with speaker_lock held."""  
-    print("test")
-    stopProgram()
-    # sys.exit()
-    print("test2")
-    with speaker_lock:
-        ev3.speaker.beep(frequency, duration)
-    # time.sleep(1)
-    
-
-def background_beep(frequency, duration):
-    """Call ev3.speaker.beep in background thread."""
-    start_new_thread(locked_beep, (frequency, duration))
-
-background_beep(660,200)
-wait(100)
-
-print("main")
-
 
 # CODE BELOW
 
 startDelay = 5000
 
-time.sleep(3)
-print("ending")
-stopProgram()
-
 reset()
 
 while (touch_sensor.pressed() == False):
     continue
-wait(startDelay - 200)
 
-print("Failure")
-sys.exit()
+countdown()
+
+# wait(startDelay - 200)
 
 start()
 
+
 drive(1000)
 wait(650)
+
 drive(250)
 while (color_sensor.reflection() < 20):
     # checkButtonPressed()
