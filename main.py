@@ -8,6 +8,12 @@ from pybricks.robotics import DriveBase
 from pybricks.iodevices import I2CDevice
 import time
 import sys
+import os
+
+import _thread
+import threading
+from _thread import start_new_thread, allocate_lock
+
 
 
 class LaserSensor:
@@ -38,7 +44,7 @@ RM_motor = Motor(Port.C)
 # Initialize sensors
 laser_sensor = LaserSensor(Port.S1)
 touch_sensor = TouchSensor(Port.S2)
-gyro_sensor = GyroSensor(Port.S3)
+# gyro_sensor = GyroSensor(Port.S3)
 color_sensor = ColorSensor(Port.S4)
 
 # Declare variables
@@ -148,7 +154,7 @@ def start():
 
 def reset():
     brake()
-    gyro_sensor.reset_angle(0)
+    # gyro_sensor.reset_angle(0)
     resetWheelAngles()
     ev3.speaker.set_volume(10)
     playNote("A")
@@ -156,15 +162,54 @@ def reset():
     playNote("A")
     print("READY TO START")
 
-def checkStop():
-    if (touch_sensor.pressed()):
-        sys.exit()
+def stopProgram():
+    sys.exit()
 
+speaker_lock = allocate_lock()
+
+def checkButtonPressed(thread_name, delay):
+    # import _thread
+    count = 0
+    while count < 3:
+        time.sleep(delay)
+        if (touch_sensor.pressed()):
+            print("test")
+            _thread.interrupt_main()
+            # os.kill()
+        count = 1
+
+
+# _thread.start_new_thread(checkButtonPressed, ("Thread-1", 0.1, ))
+# start_new_thread(checkButtonPressed, ("Thread-1", 0.1, ))
+
+def locked_beep(frequency, duration):
+    """Call ev3.speaker.beep with speaker_lock held."""  
+    print("test")
+    stopProgram()
+    # sys.exit()
+    print("test2")
+    with speaker_lock:
+        ev3.speaker.beep(frequency, duration)
+    # time.sleep(1)
+    
+
+def background_beep(frequency, duration):
+    """Call ev3.speaker.beep in background thread."""
+    start_new_thread(locked_beep, (frequency, duration))
+
+background_beep(660,200)
+wait(100)
+
+print("main")
 
 
 # CODE BELOW
 
 startDelay = 5000
+
+time.sleep(3)
+print("ending")
+stopProgram()
 
 reset()
 
@@ -172,13 +217,16 @@ while (touch_sensor.pressed() == False):
     continue
 wait(startDelay - 200)
 
+print("Failure")
+sys.exit()
+
 start()
 
 drive(1000)
 wait(650)
 drive(250)
 while (color_sensor.reflection() < 20):
-    checkStop()
+    # checkButtonPressed()
     continue
 brake()
 wait(50)
@@ -197,7 +245,7 @@ startTurn(170 * turnDirection) # turn
 
 while (laser_sensor.distance() > 700):
     printLaserDistance()
-    checkStop()
+    # checkButtonPressed()
     continue
 
 brake()
@@ -213,7 +261,7 @@ wait(100)
 drive(1000)
 
 while (color_sensor.reflection() < 20):
-    checkStop()
+    # checkButtonPressed()
     continue
 brake()
 wait(100)
@@ -228,7 +276,7 @@ while(True):
     startTurn(170 * turnDirection)
     while (laser_sensor.distance() > 700):
         # printLaserDistance()
-        checkStop()
+        # checkButtonPressed()
         continue
     brake()
     wait(100)
