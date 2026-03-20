@@ -56,7 +56,7 @@ targetAngle = 0 # degrees
 #robot.settings()
 
 # At start
-ev3.speaker.set_volume(20); #ev3.speaker.beep(660,200)
+ev3.speaker.set_volume(40); #ev3.speaker.beep(660,200)
 #print(arm_motor.angle())
 
 
@@ -182,6 +182,8 @@ reset()
 while (touch_sensor.pressed() == False):
     continue
 
+playNote("A5")
+
 countdown()
 
 # wait(startDelay - 200)
@@ -190,7 +192,7 @@ start()
 
 
 drive(1000)
-wait(650)
+wait(750)
 
 drive(250)
 while (color_sensor.reflection() < 20):
