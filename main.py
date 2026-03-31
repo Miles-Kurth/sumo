@@ -141,6 +141,7 @@ def checkSide():
     print(turnDirection)
 
 def countdown():
+    ev3.speaker.set_volume(60)
     playNote("A")
     wait(850)
     playNote("C")
@@ -152,6 +153,7 @@ def countdown():
     playNote("G")
     wait(850)
     print("test")
+    ev3.speaker.set_volume(40)
 
 def start():
     # reset()
@@ -206,9 +208,9 @@ wait(50)
 
 startTurn(1000 * turnDirection)
 if (turnDirection == -1):
-    wait(600)
+    wait(700)
 else:
-    wait(250)
+    wait(300)
 
 
 startTurn(170 * turnDirection) # turn
